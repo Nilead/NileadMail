@@ -10,9 +10,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Nilead\Mail;
+namespace Nilead\Mail\Adapter;
 
 use Mandrill;
+use Nilead\Mail\Message\Message;
 
 class MandrillAdapter extends AbstractAdapter
 {
@@ -33,74 +34,85 @@ class MandrillAdapter extends AbstractAdapter
 
     protected function parse(Message $message)
     {
-        return array(
-            'html' => $message->getHtmlBody(),
-            'text' => $message->getTextBody(),
-            'subject' => $message->getSubject(),
-            'from_email' => current($message->getFrom()),
-            'from_name' => 'Example Name',
-            'to' => array(
-                $this->getAddresses($message)
+        return array_merge(
+            array(
+                'html' => $message->getHtmlBody(),
+                'text' => $message->getTextBody(),
+                'subject' => $message->getSubject(),
+                'to' => $this->getAddresses($message),
+                'headers' => array('Reply-To' => $this->getSingleAddress($message->getReplyTo())),
+                'important' => false,
+                'track_opens' => null,
+                'track_clicks' => null,
+                'auto_text' => null,
+                'auto_html' => null,
+                'inline_css' => null,
+                'url_strip_qs' => null,
+                'preserve_recipients' => null,
+                'view_content_link' => null,
+                //            'bcc_address' => 'message.bcc_address@example.com',
+                'tracking_domain' => null,
+                'signing_domain' => null,
+                'return_path_domain' => null,
+                //            'merge' => true,
+                //            'merge_language' => 'mailchimp',
+                //            'global_merge_vars' => array(
+                //                array(
+                //                    'name' => 'merge1',
+                //                    'content' => 'merge1 content'
+                //                )
+                //            ),
+                //            'merge_vars' => array(
+                //                array(
+                //                    'rcpt' => 'recipient.email@example.com',
+                //                    'vars' => array(
+                //                        array(
+                //                            'name' => 'merge2',
+                //                            'content' => 'merge2 content'
+                //                        )
+                //                    )
+                //                )
+                //            ),
+                //            'tags' => array('password-resets'),
+                //            'subaccount' => 'customer-123',
+                //            'google_analytics_domains' => array('example.com'),
+                //            'google_analytics_campaign' => 'message.from_email@example.com',
+                //            'metadata' => array('website' => 'www.example.com'),
+                //            'recipient_metadata' => array(
+                //                array(
+                //                    'rcpt' => 'recipient.email@example.com',
+                //                    'values' => array('user_id' => 123456)
+                //                )
+                //            ),
+                //            'attachments' => array(
+                //                array(
+                //                    'type' => 'text/plain',
+                //                    'name' => 'myfile.txt',
+                //                    'content' => 'ZXhhbXBsZSBmaWxl'
+                //                )
+                //            ),
+                //            'images' => array(
+                //                array(
+                //                    'type' => 'image/png',
+                //                    'name' => 'IMAGECID',
+                //                    'content' => 'ZXhhbXBsZSBmaWxl'
+                //                )
+                //            )
             ),
-            'headers' => array('Reply-To' => $message->getReplyTo()),
-            'important' => false,
-            'track_opens' => null,
-            'track_clicks' => null,
-            'auto_text' => null,
-            'auto_html' => null,
-            'inline_css' => null,
-            'url_strip_qs' => null,
-            'preserve_recipients' => null,
-            'view_content_link' => null,
-            //            'bcc_address' => 'message.bcc_address@example.com',
-            'tracking_domain' => null,
-            'signing_domain' => null,
-            'return_path_domain' => null,
-            //            'merge' => true,
-            //            'merge_language' => 'mailchimp',
-            //            'global_merge_vars' => array(
-            //                array(
-            //                    'name' => 'merge1',
-            //                    'content' => 'merge1 content'
-            //                )
-            //            ),
-            //            'merge_vars' => array(
-            //                array(
-            //                    'rcpt' => 'recipient.email@example.com',
-            //                    'vars' => array(
-            //                        array(
-            //                            'name' => 'merge2',
-            //                            'content' => 'merge2 content'
-            //                        )
-            //                    )
-            //                )
-            //            ),
-            //            'tags' => array('password-resets'),
-            //            'subaccount' => 'customer-123',
-            //            'google_analytics_domains' => array('example.com'),
-            //            'google_analytics_campaign' => 'message.from_email@example.com',
-            //            'metadata' => array('website' => 'www.example.com'),
-            //            'recipient_metadata' => array(
-            //                array(
-            //                    'rcpt' => 'recipient.email@example.com',
-            //                    'values' => array('user_id' => 123456)
-            //                )
-            //            ),
-            //            'attachments' => array(
-            //                array(
-            //                    'type' => 'text/plain',
-            //                    'name' => 'myfile.txt',
-            //                    'content' => 'ZXhhbXBsZSBmaWxl'
-            //                )
-            //            ),
-            //            'images' => array(
-            //                array(
-            //                    'type' => 'image/png',
-            //                    'name' => 'IMAGECID',
-            //                    'content' => 'ZXhhbXBsZSBmaWxl'
-            //                )
-            //            )
+            $this->getFrom($message->getFrom())
         );
+    }
+
+    protected function getFrom($addresses)
+    {
+        foreach ($addresses as $address => $name) {
+            return [
+                'from_email' => $address,
+                'from_name' => $name
+            ];
+        };
+
+        return [];
     }
 
     protected function getAddresses(Message $message)
@@ -118,12 +130,14 @@ class MandrillAdapter extends AbstractAdapter
 
     protected function _getAddresses($addresses, $type, &$list)
     {
-        foreach ($addresses as $address => $name) {
-            $list[] = [
-                'email' => $address,
-                'name' => $name,
-                'type' => $type
-            ];
+        if (is_array($addresses)) {
+            foreach ($addresses as $address => $name) {
+                $list[] = [
+                    'email' => $address,
+                    'name' => $name,
+                    'type' => $type
+                ];
+            }
         }
     }
 }

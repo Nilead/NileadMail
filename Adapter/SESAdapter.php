@@ -10,11 +10,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Nilead\Mail;
+namespace Nilead\Mail\Adapter;
 
 use Aws\Ses\SesClient;
+use Nilead\Mail\Message\Message;
 
-class SESAdapter
+class SesAdapter extends AbstractAdapter
 {
     protected $client;
 
@@ -32,7 +33,7 @@ class SESAdapter
     {
         return array(
             // Source is required
-            'Source' => $this->getFrom($message->getFrom()),
+            'Source' => $this->getSingleAddress($message->getFrom()),
             // Destination is required
             'Destination' => array(
                 'ToAddresses' => $this->getAddresses($message->getTo()),
@@ -64,20 +65,6 @@ class SESAdapter
             'ReplyToAddresses' => $message->getReplyTo(),
             'ReturnPath' => $message->getReturnPath(),
         );
-    }
-
-    protected function getFrom($addresses)
-    {
-        // we get only 1 address
-        foreach ($addresses as $address => $name) {
-            if (empty($name)) {
-                return $address;
-            } else {
-                return sprintf('%s <%s>', $name, $address);
-            }
-        }
-
-        return false;
     }
 
     protected function getAddresses($addresses)
