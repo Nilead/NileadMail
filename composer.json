@@ -1,0 +1,29 @@
+{
+    "name": "nilead/nilead-mail",
+    "description": "The \"NiLead workers",
+    "authors": [
+        {
+            "name": "Raine Ng",
+            "email": "vunguyen@rubikin.com",
+            "homepage": "http://rubikin.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0",
+        "swiftmailer/swiftmailer": "5.3.*@dev"
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nilead\\Mail\\": ""
+        }
+    },
+    "minimum-stability": "beta",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.0.x-dev"
+        }
+    }
+}
