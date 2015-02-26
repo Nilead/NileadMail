@@ -31,14 +31,14 @@ class SesAdapter extends AbstractAdapter
 
     protected function parse(MessageInterface $message)
     {
-        return array(
+        $result = array(
             // Source is required
             'Source' => $this->getSingleAddress($message->getFrom()),
             // Destination is required
             'Destination' => array(
                 'ToAddresses' => $this->getAddresses($message->getTo()),
-//                'CcAddresses' => $this->getAddresses($message->getCc()),
-//                'BccAddresses' => $this->getAddresses($message->getBcc())
+                //                'CcAddresses' => $this->getAddresses($message->getCc()),
+                //                'BccAddresses' => $this->getAddresses($message->getBcc())
             ),
             // Message is required
             'Message' => array(
@@ -55,16 +55,20 @@ class SesAdapter extends AbstractAdapter
                         'Data' => $message->getBody(),
                         'Charset' => 'utf-8',
                     ),
-//                    'Html' => array(
-//                        // Data is required
-//                        'Data' => $message->getBodyHtml(),
-//                        'Charset' => 'utf-8',
-//                    ),
                 ),
             ),
             'ReplyToAddresses' => $message->getReplyTo(),
             'ReturnPath' => $message->getReturnPath(),
         );
+
+        if (!empty($message->getBodyHtml())) {
+            $result['Message']['Body']['Html'] = [
+                'Data' => $message->getBodyHtml(),
+                'Charset' => 'utf-8',
+            ];
+        }
+
+        return $result;
     }
 
     protected function getAddresses($addresses)
