@@ -14,7 +14,7 @@
 namespace Nilead\Mail;
 
 use Nilead\Mail\Adapter\AdapterInterface;
-use Nilead\Mail\Message\Message;
+use Nilead\Notification\Message\MessageInterface;
 
 class Mailer
 {
@@ -28,7 +28,7 @@ class Mailer
         $this->mailers[$key] = $client;
     }
 
-    public function send($key, Message $message)
+    public function send($key, MessageInterface $message)
     {
         return $this->mailers[$key]->send($message);
     }

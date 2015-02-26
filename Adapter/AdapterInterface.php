@@ -12,9 +12,9 @@
 
 namespace Nilead\Mail\Adapter;
 
-use Nilead\Mail\Message\Message;
+use Nilead\Notification\Message\MessageInterface;
 
 interface AdapterInterface
 {
-    public function send(Message $message);
+    public function send(MessageInterface $message);
 }

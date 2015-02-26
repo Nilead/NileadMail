@@ -13,7 +13,7 @@
 namespace Nilead\Mail\Adapter;
 
 use Aws\Ses\SesClient;
-use Nilead\Mail\Message\Message;
+use Nilead\Notification\Message\MessageInterface;
 
 class SesAdapter extends AbstractAdapter
 {
@@ -24,12 +24,12 @@ class SesAdapter extends AbstractAdapter
         $this->client = $client;
     }
 
-    public function send(Message $message)
+    public function send(MessageInterface $message)
     {
-        $this->client->send($this->parse($message));
+        $this->client->sendEmail($this->parse($message));
     }
 
-    protected function parse(Message $message)
+    protected function parse(MessageInterface $message)
     {
         return array(
             // Source is required
@@ -37,8 +37,8 @@ class SesAdapter extends AbstractAdapter
             // Destination is required
             'Destination' => array(
                 'ToAddresses' => $this->getAddresses($message->getTo()),
-                'CcAddresses' => $this->getAddresses($message->getCc()),
-                'BccAddresses' => $this->getAddresses($message->getBcc())
+//                'CcAddresses' => $this->getAddresses($message->getCc()),
+//                'BccAddresses' => $this->getAddresses($message->getBcc())
             ),
             // Message is required
             'Message' => array(
@@ -46,20 +46,20 @@ class SesAdapter extends AbstractAdapter
                 'Subject' => array(
                     // Data is required
                     'Data' => $message->getSubject(),
-                    'Charset' => $message->getCharset(),
+                    'Charset' => 'utf-8',
                 ),
                 // Body is required
                 'Body' => array(
                     'Text' => array(
                         // Data is required
-                        'Data' => $message->getTextBody(),
-                        'Charset' => $message->getCharset(),
+                        'Data' => $message->getBody(),
+                        'Charset' => 'utf-8',
                     ),
-                    'Html' => array(
-                        // Data is required
-                        'Data' => $message->getHtmlBody(),
-                        'Charset' => $message->getCharset(),
-                    ),
+//                    'Html' => array(
+//                        // Data is required
+//                        'Data' => $message->getBodyHtml(),
+//                        'Charset' => 'utf-8',
+//                    ),
                 ),
             ),
             'ReplyToAddresses' => $message->getReplyTo(),
@@ -70,11 +70,11 @@ class SesAdapter extends AbstractAdapter
     protected function getAddresses($addresses)
     {
         $list = [];
-        foreach ($addresses as $address => $name) {
-            if (empty($name)) {
-                $list[] = $address;
+        foreach ($addresses as $key => $value) {
+            if (is_numeric($key)) {
+                $list[] = $value;
             } else {
-                $list[] = sprintf('%s <%s>', $name, $address);
+                $list[] = sprintf('%s <%s>', $value, $key);
             }
         }
 

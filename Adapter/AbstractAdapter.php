@@ -16,11 +16,11 @@ abstract class AbstractAdapter implements AdapterInterface
     protected function getSingleAddress($addresses)
     {
         // we get only 1 address
-        foreach ($addresses as $address => $name) {
-            if (empty($name)) {
-                return $address;
+        foreach ($addresses as $key => $value) {
+            if (is_numeric($key)) {
+                return $value;
             } else {
-                return sprintf('%s <%s>', $name, $address);
+                return sprintf('%s <%s>', $value, $key);
             }
         }
 

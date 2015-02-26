@@ -13,7 +13,7 @@
 namespace Nilead\Mail\Adapter;
 
 use Mandrill;
-use Nilead\Mail\Message\Message;
+use Nilead\Notification\Message\MessageInterface;
 
 class MandrillAdapter extends AbstractAdapter
 {
@@ -27,17 +27,17 @@ class MandrillAdapter extends AbstractAdapter
         $this->client = $client;
     }
 
-    public function send(Message $message)
+    public function send(MessageInterface $message)
     {
         return $this->client->messages->send($this->parse($message));
     }
 
-    protected function parse(Message $message)
+    protected function parse(MessageInterface $message)
     {
         return array_merge(
             array(
-                'html' => $message->getHtmlBody(),
-                'text' => $message->getTextBody(),
+                'html' => $message->getBodyHtml(),
+                'text' => $message->getBody(),
                 'subject' => $message->getSubject(),
                 'to' => $this->getAddresses($message),
                 'headers' => array('Reply-To' => $this->getSingleAddress($message->getReplyTo())),
@@ -105,25 +105,31 @@ class MandrillAdapter extends AbstractAdapter
 
     protected function getFrom($addresses)
     {
-        foreach ($addresses as $address => $name) {
-            return [
-                'from_email' => $address,
-                'from_name' => $name
-            ];
+        foreach ($addresses as $key => $value) {
+            if (is_numeric($key)) {
+                return [
+                    'from_email' => $value,
+                ];
+            } else {
+                return [
+                    'from_email' => $key,
+                    'from_name' => $value
+                ];
+            }
         };
 
         return [];
     }
 
-    protected function getAddresses(Message $message)
+    protected function getAddresses(MessageInterface $message)
     {
         $list = [];
 
         $this->_getAddresses($message->getTo(), 'to', $list);
 
-        $this->_getAddresses($message->getCc(), 'cc', $list);
+//        $this->_getAddresses($message->getCc(), 'cc', $list);
 
-        $this->_getAddresses($message->getBcc(), 'bcc', $list);
+//        $this->_getAddresses($message->getBcc(), 'bcc', $list);
 
         return $list;
     }
@@ -131,12 +137,19 @@ class MandrillAdapter extends AbstractAdapter
     protected function _getAddresses($addresses, $type, &$list)
     {
         if (is_array($addresses)) {
-            foreach ($addresses as $address => $name) {
-                $list[] = [
-                    'email' => $address,
-                    'name' => $name,
-                    'type' => $type
-                ];
+            foreach ($addresses as $key => $value) {
+                if (is_numeric($key)) {
+                    $list[] = [
+                        'email' => $value,
+                        'type' => $type
+                    ];
+                } else {
+                    $list[] = [
+                        'email' => $key,
+                        'name' => $value,
+                        'type' => $type
+                    ];
+                }
             }
         }
     }
