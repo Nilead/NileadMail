@@ -19,28 +19,32 @@ class MessageArrayConverter
     {
         $message = new Message();
         $message
-            ->setFrom($data['from'])
-            ->setTo($data['to']);
+            ->setFrom((array)$data['from'])
+            ->setTo((array)$data['to']);
 
         if (isset ($data['cc'])) {
-            $message->setCc($data['cc']);
+            $message->setCc((array)$data['cc']);
         }
 
         if (isset ($data['bcc'])) {
-            $message->setBcc($data['bcc']);
+            $message->setBcc((array)$data['bcc']);
         }
 
         $message->setSubject($data['subject']);
 
-        $message->setBody($data['text'], 'plain/text');
+        $message->setBody($data['body'], 'plain/text');
 
-        if (isset ($data['html'])) {
+        if (isset ($data['bodyHtml'])) {
             $message->setHtmlBody($data['html']);
         }
 
-        $message->setReplyTo($data['replyTo']);
+        if (isset ($data['replyTo'])) {
+            $message->setReplyTo($data['replyTo']);
+        }
 
-        $message->setReturnPath($data['returnPath']);
+        if (isset ($data['returnPath'])) {
+            $message->setReturnPath($data['returnPath']);
+        }
 
         return $message;
     }

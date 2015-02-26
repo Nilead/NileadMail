@@ -26,7 +26,7 @@ class SesAdapter extends AbstractAdapter
 
     public function send(Message $message)
     {
-        $this->client->send($this->parse($message));
+        $this->client->sendEmail($this->parse($message));
     }
 
     protected function parse(Message $message)
@@ -57,7 +57,7 @@ class SesAdapter extends AbstractAdapter
                     ),
                     'Html' => array(
                         // Data is required
-                        'Data' => $message->getHtmlBody(),
+                        'Data' => $message->getHtmlBody() . 'aaaa',
                         'Charset' => $message->getCharset(),
                     ),
                 ),
