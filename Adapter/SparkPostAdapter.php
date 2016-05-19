@@ -34,14 +34,14 @@ class SparkPostAdapter extends AbstractAdapter
     {
         return array_merge(
             array(
-                'html' => $message->getBodyHtml(),
-                'text' => $message->getBody(),
-                'subject' => $message->getSubject(),
-                'recipients' => $this->getAddresses($message),
-                'replyTo' => $this->getSingleAddress($message->getReplyTo()),
-                'trackClicks' => true,
-                'trackOpens' => true,
-                'inlineCss' => true,
+                'html'          => $message->getBodyHtml(),
+                'text'          => $message->getBody(),
+                'subject'       => $message->getSubject(),
+                'recipients'    => $this->getAddresses($message),
+                'replyTo'       => $this->getSingleAddress($message->getReplyTo()),
+                'trackClicks'   => true,
+                'trackOpens'    => true,
+                'inlineCss'     => true,
                 'transactional' => true,
             ),
             $this->getFrom($message->getFrom())
@@ -53,7 +53,7 @@ class SparkPostAdapter extends AbstractAdapter
         foreach ($addresses as $key => $value) {
             if (is_numeric($key)) {
                 return [
-                    'from' = [
+                    'from' => [
                         'email' => $value
                     ]
                 ];
