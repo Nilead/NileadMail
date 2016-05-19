@@ -38,8 +38,11 @@ class SparkPostAdapter extends AbstractAdapter
                 'text' => $message->getBody(),
                 'subject' => $message->getSubject(),
                 'recipients' => $this->getAddresses($message),
-                'customHeaders' => array('Reply-To' => $this->getSingleAddress($message->getReplyTo())),
-                'trackClicks' => true
+                'replyTo' => $this->getSingleAddress($message->getReplyTo()),
+                'trackClicks' => true,
+                'trackOpens' => true,
+                'inlineCss' => true,
+                'transactional' => true,
             ),
             $this->getFrom($message->getFrom())
         );
@@ -50,7 +53,9 @@ class SparkPostAdapter extends AbstractAdapter
         foreach ($addresses as $key => $value) {
             if (is_numeric($key)) {
                 return [
-                    'from' => $value,
+                    'from' = [
+                        'email' => $value
+                    ]
                 ];
             } else {
                 return [
