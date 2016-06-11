@@ -10,8 +10,8 @@
 
 namespace Nilead\Mail\Adapter;
 
-use SparkPost\SparkPost;
 use Nilead\Notification\Message\MessageInterface;
+use SparkPost\SparkPost;
 
 class SparkPostAdapter extends AbstractAdapter
 {
@@ -34,12 +34,12 @@ class SparkPostAdapter extends AbstractAdapter
     {
         return array_merge(
             array(
-                'html'          => $message->getBodyHtml(),
-                'text'          => $message->getBody(),
-                'subject'       => $message->getSubject(),
-                'recipients'    => $this->getAddresses($message),
-                'trackClicks'   => true,
-                'inlineCss'     => true,
+                'html'        => $message->getBodyHtml(),
+                'text'        => $message->getBody(),
+                'subject'     => $message->getSubject(),
+                'recipients'  => $this->getAddresses($message),
+                'trackClicks' => true,
+                'inlineCss'   => true,
             ),
             $this->getFrom($message->getFrom()),
             $this->getReplyTo($message->getReplyTo())
@@ -48,8 +48,7 @@ class SparkPostAdapter extends AbstractAdapter
 
     protected function getReplyTo($replyTo)
     {
-        if(!$this->getSingleAddress($replyTo))
-        {
+        if (!$this->getSingleAddress($replyTo)) {
             return ['replyTo' => $this->getSingleAddress($replyTo)];
         } else {
             return [];
@@ -62,15 +61,15 @@ class SparkPostAdapter extends AbstractAdapter
             if (is_numeric($key)) {
                 return [
                     'from' => [
-                        'email' => $value
-                    ]
+                        'email' => $value,
+                    ],
                 ];
             } else {
                 return [
                     'from' => [
-                        'name' => $key,
-                        'email' => $value
-                    ]
+                        'name'  => $key,
+                        'email' => $value,
+                    ],
                 ];
             }
         };
@@ -100,7 +99,7 @@ class SparkPostAdapter extends AbstractAdapter
                 } else {
                     $list[] = [
                         'address' => [
-                            'name' => $value,
+                            'name'  => $value,
                             'email' => $key,
                         ],
                     ];
