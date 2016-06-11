@@ -38,14 +38,22 @@ class SparkPostAdapter extends AbstractAdapter
                 'text'          => $message->getBody(),
                 'subject'       => $message->getSubject(),
                 'recipients'    => $this->getAddresses($message),
-                'replyTo'       => $this->getSingleAddress($message->getReplyTo()),
                 'trackClicks'   => true,
-                'trackOpens'    => true,
                 'inlineCss'     => true,
-                'transactional' => true,
             ),
-            $this->getFrom($message->getFrom())
+            $this->getFrom($message->getFrom()),
+            $this->getReplyTo($message->getReplyTo())
         );
+    }
+
+    protected function getReplyTo($replyTo)
+    {
+        if(!$this->getSingleAddress($replyTo))
+        {
+            return ['replyTo' => $this->getSingleAddress($replyTo)];
+        } else {
+            return [];
+        }
     }
 
     protected function getFrom($addresses)
