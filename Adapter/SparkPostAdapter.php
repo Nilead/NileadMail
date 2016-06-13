@@ -48,7 +48,7 @@ class SparkPostAdapter extends AbstractAdapter
 
     protected function getReplyTo($replyTo)
     {
-        if (!$this->getSingleAddress($replyTo)) {
+        if (false !== $this->getSingleAddress($replyTo)) {
             return ['replyTo' => $this->getSingleAddress($replyTo)];
         } else {
             return [];
