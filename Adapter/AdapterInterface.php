@@ -13,8 +13,9 @@
 namespace Nilead\Mail\Adapter;
 
 use Nilead\Notification\Message\MessageInterface;
+use Psr\Log\LoggerInterface;
 
 interface AdapterInterface
 {
-    public function send(MessageInterface $message);
+    public function send(MessageInterface $message, LoggerInterface $logger);
 }

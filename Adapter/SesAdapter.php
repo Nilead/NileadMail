@@ -12,8 +12,9 @@
 
 namespace Nilead\Mail\Adapter;
 
-use Aws\Ses\SesClient;
 use Nilead\Notification\Message\MessageInterface;
+use Aws\Ses\SesClient;
+use Psr\Log\LoggerInterface;
 
 class SesAdapter extends AbstractAdapter
 {
@@ -24,7 +25,7 @@ class SesAdapter extends AbstractAdapter
         $this->client = $client;
     }
 
-    public function send(MessageInterface $message)
+    public function send(MessageInterface $message, LoggerInterface $logger)
     {
         $this->client->sendEmail($this->parse($message));
     }

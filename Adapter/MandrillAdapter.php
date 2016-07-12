@@ -12,8 +12,9 @@
 
 namespace Nilead\Mail\Adapter;
 
-use Mandrill;
 use Nilead\Notification\Message\MessageInterface;
+use Mandrill;
+use Psr\Log\LoggerInterface;
 
 class MandrillAdapter extends AbstractAdapter
 {
@@ -27,7 +28,7 @@ class MandrillAdapter extends AbstractAdapter
         $this->client = $client;
     }
 
-    public function send(MessageInterface $message)
+    public function send(MessageInterface $message, LoggerInterface $logger)
     {
         return $this->client->messages->send($this->parse($message));
     }
