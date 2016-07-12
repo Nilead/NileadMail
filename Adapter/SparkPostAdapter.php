@@ -30,7 +30,7 @@ class SparkPostAdapter extends AbstractAdapter
     public function send(MessageInterface $message, LoggerInterface $logger)
     {
         try {
-            return $this->client->transmission->send($this->parse($message));
+            return $this->client->transmissions->post($this->parse($message));
         } catch (\APIResponseException $e) {
             $logger->critical(sprintf("Error code: %s\r\n Error message: %s\r\n Error description: %s\r\n", $e->getAPICode(), $e->getAPIMessage(), $e->getAPIDescription()));
         } catch (\Exception $e) {
