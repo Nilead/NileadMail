@@ -42,15 +42,25 @@ class SparkPostAdapter extends AbstractAdapter
     {
         return array_merge(
             array(
-                'html' => $message->getBodyHtml(),
-                'text' => $message->getBody(),
-                'subject' => $message->getSubject(),
-                'recipients' => $this->getAddresses($message),
-                'customHeaders' => array('Reply-To' => $this->getSingleAddress($message->getReplyTo())),
-                'trackClicks' => true
+                'html'        => $message->getBodyHtml(),
+                'text'        => $message->getBody(),
+                'subject'     => $message->getSubject(),
+                'recipients'  => $this->getAddresses($message),
+                'trackClicks' => true,
+                'inlineCss'   => true,
             ),
-            $this->getFrom($message->getFrom())
+            $this->getFrom($message->getFrom()),
+            $this->getReplyTo($message->getReplyTo())
         );
+    }
+
+    protected function getReplyTo($replyTo)
+    {
+        if (false !== $this->getSingleAddress($replyTo)) {
+            return ['replyTo' => $this->getSingleAddress($replyTo)];
+        } else {
+            return [];
+        }
     }
 
     protected function getFrom($addresses)
@@ -58,14 +68,16 @@ class SparkPostAdapter extends AbstractAdapter
         foreach ($addresses as $key => $value) {
             if (is_numeric($key)) {
                 return [
-                    'from' => $value,
+                    'from' => [
+                        'email' => $value,
+                    ],
                 ];
             } else {
                 return [
                     'from' => [
-                        'name' => $key,
-                        'email' => $value
-                    ]
+                        'name'  => $key,
+                        'email' => $value,
+                    ],
                 ];
             }
         };
@@ -95,7 +107,7 @@ class SparkPostAdapter extends AbstractAdapter
                 } else {
                     $list[] = [
                         'address' => [
-                            'name' => $value,
+                            'name'  => $value,
                             'email' => $key,
                         ],
                     ];
