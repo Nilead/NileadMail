@@ -15,6 +15,7 @@ namespace Nilead\Mail;
 
 use Nilead\Mail\Adapter\AdapterInterface;
 use Nilead\Notification\Message\MessageInterface;
+use Psr\Log\LoggerInterface;
 
 class Mailer
 {
@@ -23,6 +24,17 @@ class Mailer
      */
     protected $mailers = [];
 
+    /**
+     * 
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+    
     public function registerMailer($key, AdapterInterface $client)
     {
         $this->mailers[$key] = $client;
@@ -30,6 +42,6 @@ class Mailer
 
     public function send($key, MessageInterface $message)
     {
-        return $this->mailers[$key]->send($message);
+        return $this->mailers[$key]->send($message, $this->logger);
     }
 }
