@@ -40,18 +40,19 @@ class SparkPostAdapter extends AbstractAdapter
 
     protected function parse(MessageInterface $message)
     {
-        return array_merge(
+        $content = array_merge(
             array(
                 'html'        => $message->getBodyHtml(),
                 'text'        => $message->getBody(),
                 'subject'     => $message->getSubject(),
-                'recipients'  => $this->getAddresses($message),
-                'trackClicks' => true,
-                'inlineCss'   => true,
             ),
             $this->getFrom($message->getFrom()),
-            $this->getReplyTo($message->getReplyTo())
         );
+                
+        return [ 
+            'content'    => $content,
+            'recipients' => $this->getAddresses($message),
+        ];
     }
 
     protected function getReplyTo($replyTo)
