@@ -33,7 +33,7 @@ class SparkPostAdapter extends AbstractAdapter
     {
         try {
             $promise = $this->client->transmissions->post($this->parse($message));
-            $logger->info(sprintf("Status code: %s\r\n Body message: %s\r\n", $promise->getStatusCode(), $promise->getBody()));
+            $logger->info(sprintf("Status code: %s\r\n Body message: %s\r\n", $promise->getStatusCode(), print_r($promise->getBody(), true)));
         } catch (\APIResponseException $e) {
             $logger->critical(sprintf("Error code: %s\r\n Error message: %s\r\n Error description: %s\r\n", $e->getAPICode(), $e->getAPIMessage(), $e->getAPIDescription()));
         } catch (\Exception $e) {
