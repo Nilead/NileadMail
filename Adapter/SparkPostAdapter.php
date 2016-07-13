@@ -25,12 +25,15 @@ class SparkPostAdapter extends AbstractAdapter
     public function __construct(SparkPost $client)
     {
         $this->client = $client;
+        $this->client->setOptions(['async' => false]);
+
     }
 
     public function send(MessageInterface $message, LoggerInterface $logger)
     {
         try {
-            return $this->client->transmissions->post($this->parse($message));
+            $promise = $this->client->transmissions->post($this->parse($message));
+            $logger->info(sprintf("Status code: %s\r\n Body message: %s\r\n", $promise->getStatusCode(), $promise->getBody()));
         } catch (\APIResponseException $e) {
             $logger->critical(sprintf("Error code: %s\r\n Error message: %s\r\n Error description: %s\r\n", $e->getAPICode(), $e->getAPIMessage(), $e->getAPIDescription()));
         } catch (\Exception $e) {
