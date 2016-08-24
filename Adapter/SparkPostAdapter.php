@@ -49,7 +49,8 @@ class SparkPostAdapter extends AbstractAdapter
                 'text'        => $message->getBody(),
                 'subject'     => $message->getSubject(),
             ],
-            $this->getFrom($message->getFrom())
+            $this->getFrom($message->getFrom()),
+            $this->getReplyTo($message->getReplyTo())
         );
                 
         return [ 
@@ -61,7 +62,7 @@ class SparkPostAdapter extends AbstractAdapter
     protected function getReplyTo($replyTo)
     {
         if (false !== $this->getSingleAddress($replyTo)) {
-            return ['replyTo' => $this->getSingleAddress($replyTo)];
+            return ['reply_to' => $this->getSingleAddress($replyTo)];
         } else {
             return [];
         }
