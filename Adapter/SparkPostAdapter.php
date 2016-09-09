@@ -11,9 +11,10 @@
 namespace Nilead\Mail\Adapter;
 
 use Nilead\Notification\Message\MessageInterface;
-use SparkPost\SparkPost;
-use SparkPost\APIResponseException;
 use Psr\Log\LoggerInterface;
+use SparkPost\APIResponseException;
+use SparkPost\SparkPost;
+
 
 class SparkPostAdapter extends AbstractAdapter
 {
@@ -33,28 +34,44 @@ class SparkPostAdapter extends AbstractAdapter
     {
         try {
             $promise = $this->client->transmissions->post($this->parse($message));
-            $logger->info(sprintf("Status code: %s\r\n Body message: %s\r\n", $promise->getStatusCode(), print_r($promise->getBody(), true)));
+            $logger->info(
+                sprintf(
+                    "Status code: %s\r\n Body message: %s\r\n",
+                    $promise->getStatusCode(),
+                    print_r($promise->getBody(), true)
+                )
+            );
         } catch (\APIResponseException $e) {
-            $logger->critical(sprintf("Error code: %s\r\n Error message: %s\r\n Error description: %s\r\n", $e->getAPICode(), $e->getAPIMessage(), $e->getAPIDescription()));
+            $logger->critical(sprintf("Error sending to %s", implode(", ", $message->getTo())));
+            $logger->critical(
+                sprintf(
+                    "Error code: %s\r\n Error message: %s\r\n Error description: %s\r\n",
+                    $e->getAPICode(),
+                    $e->getAPIMessage(),
+                    $e->getAPIDescription()
+                )
+            );
         } catch (\Exception $e) {
+            $logger->critical(sprintf("Error sending to %s", implode(", ", $message->getTo())));
             $logger->critical(sprintf("Error code: %s\r\n Error message: %s\r\n", $e->getCode(), $e->getMessage()));
         }
     }
+
 
     protected function parse(MessageInterface $message)
     {
         $content = array_merge(
             [
-                'html'        => $message->getBodyHtml(),
-                'text'        => $message->getBody(),
-                'subject'     => $message->getSubject(),
+                'html' => $message->getBodyHtml(),
+                'text' => $message->getBody(),
+                'subject' => $message->getSubject(),
             ],
             $this->getFrom($message->getFrom()),
             $this->getReplyTo($message->getReplyTo())
         );
-                
-        return [ 
-            'content'    => $content,
+
+        return [
+            'content' => $content,
             'recipients' => $this->getAddresses($message)
         ];
     }
@@ -80,7 +97,7 @@ class SparkPostAdapter extends AbstractAdapter
             } else {
                 return [
                     'from' => [
-                        'name'  => $key,
+                        'name' => $key,
                         'email' => $value,
                     ],
                 ];
@@ -112,7 +129,7 @@ class SparkPostAdapter extends AbstractAdapter
                 } else {
                     $list[] = [
                         'address' => [
-                            'name'  => $value,
+                            'name' => $value,
                             'email' => $key,
                         ],
                     ];
