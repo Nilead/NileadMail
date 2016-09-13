@@ -38,7 +38,7 @@ class SparkPostAdapter extends AbstractAdapter
                 sprintf(
                     "Status code: %s\r\n Body message: %s\r\n",
                     $promise->getStatusCode(),
-                    print_r($promise->getBody(), true)
+                    json_encode($promise->getBody())
                 )
             );
         } catch (\APIResponseException $e) {
