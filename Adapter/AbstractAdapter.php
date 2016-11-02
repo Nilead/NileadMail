@@ -15,6 +15,10 @@ abstract class AbstractAdapter implements AdapterInterface
 {
     protected function getSingleAddress($addresses)
     {
+        if (!is_array($addresses)) {
+            $addresses = (array) $addresses;
+        }
+
         // we get only 1 address
         foreach ($addresses as $key => $value) {
             if (is_numeric($key)) {

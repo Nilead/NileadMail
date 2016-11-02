@@ -11,9 +11,8 @@
 namespace Nilead\Mail\Adapter;
 
 use Nilead\Notification\Message\MessageInterface;
-use SparkPost\SparkPost;
-use SparkPost\APIResponseException;
 use Psr\Log\LoggerInterface;
+use SparkPost\SparkPost;
 
 class SparkPostAdapter extends AbstractAdapter
 {
@@ -33,9 +32,22 @@ class SparkPostAdapter extends AbstractAdapter
     {
         try {
             $promise = $this->client->transmissions->post($this->parse($message));
-            $logger->info(sprintf("Status code: %s\r\n Body message: %s\r\n", $promise->getStatusCode(), print_r($promise->getBody(), true)));
+            $logger->info(
+                sprintf(
+                    "Status code: %s\r\n Body message: %s\r\n",
+                    $promise->getStatusCode(),
+                    json_encode($promise->getBody())
+                )
+            );
         } catch (\APIResponseException $e) {
-            $logger->critical(sprintf("Error code: %s\r\n Error message: %s\r\n Error description: %s\r\n", $e->getAPICode(), $e->getAPIMessage(), $e->getAPIDescription()));
+            $logger->critical(
+                sprintf(
+                    "Error code: %s\r\n Error message: %s\r\n Error description: %s\r\n",
+                    $e->getAPICode(),
+                    $e->getAPIMessage(),
+                    $e->getAPIDescription()
+                )
+            );
         } catch (\Exception $e) {
             $logger->critical(sprintf("Error code: %s\r\n Error message: %s\r\n", $e->getCode(), $e->getMessage()));
         }
@@ -43,80 +55,54 @@ class SparkPostAdapter extends AbstractAdapter
 
     protected function parse(MessageInterface $message)
     {
-        $content = array_merge(
-            [
-                'html'        => $message->getBodyHtml(),
-                'text'        => $message->getBody(),
-                'subject'     => $message->getSubject(),
+        $content = [
+            'content' => [
+                'html' => $message->getBodyHtml(),
+                'text' => $message->getBody(),
+                'subject' => $message->getSubject(),
+                'from' => $this->getSingleAddress($message->getFrom()),
+                'replyTo' => $this->getSingleAddress($message->getReplyTo())
             ],
-            $this->getFrom($message->getFrom())
-        );
-                
-        return [ 
-            'content'    => $content,
-            'recipients' => $this->getAddresses($message)
+            'recipients' => $this->getAddresses($message->getTo())
         ];
+
+        return $content;
     }
 
     protected function getReplyTo($replyTo)
     {
-        if (false !== $this->getSingleAddress($replyTo)) {
-            return ['replyTo' => $this->getSingleAddress($replyTo)];
+        if (false !== ($address = $this->getSingleAddress($replyTo))) {
+            return ['reply_to' => $address];
         } else {
             return [];
         }
     }
 
-    protected function getFrom($addresses)
+    protected function getAddresses($addresses)
     {
+        $list = [];
+
+        if (!is_array($addresses)) {
+            $addresses = (array) $addresses;
+        }
+
         foreach ($addresses as $key => $value) {
             if (is_numeric($key)) {
-                return [
-                    'from' => [
+                $list[] = [
+                    'address' => [
                         'email' => $value,
                     ],
                 ];
             } else {
-                return [
-                    'from' => [
-                        'name'  => $key,
-                        'email' => $value,
+                $list[] = [
+                    'address' => [
+                        'name' => $value,
+                        'email' => $key,
                     ],
                 ];
             }
-        };
-
-        return [];
-    }
-
-    protected function getAddresses(MessageInterface $message)
-    {
-        $list = [];
-
-        $this->_getAddresses($message->getTo(), $list);
+        }
 
         return $list;
-    }
-
-    protected function _getAddresses($addresses, &$list)
-    {
-        if (is_array($addresses)) {
-            foreach ($addresses as $key => $value) {
-                if (is_numeric($key)) {
-                    $list[] = [
-                        'address' => [
-                            'email' => $value,
-                        ],
-                    ];
-                } else {
-                    $list[] = [
-                        'address' => [
-                            'name'  => $value,
-                            'email' => $key,
-                        ],
-                    ];
-                }
-            }
-        }
     }
 }
