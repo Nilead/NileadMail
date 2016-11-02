@@ -25,7 +25,6 @@ class SparkPostAdapter extends AbstractAdapter
     {
         $this->client = $client;
         $this->client->setOptions(['async' => false]);
-
     }
 
     public function send(MessageInterface $message, LoggerInterface $logger)
@@ -49,9 +48,11 @@ class SparkPostAdapter extends AbstractAdapter
                 )
             );
         } catch (\Exception $e) {
+            $logger->critical(sprintf("Error sending to %s", implode(", ", $message->getTo())));
             $logger->critical(sprintf("Error code: %s\r\n Error message: %s\r\n", $e->getCode(), $e->getMessage()));
         }
     }
+
 
     protected function parse(MessageInterface $message)
     {
