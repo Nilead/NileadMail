@@ -61,7 +61,7 @@ class SparkPostAdapter extends AbstractAdapter
                 'html' => $message->getBodyHtml(),
                 'text' => $message->getBody(),
                 'subject' => $message->getSubject(),
-                'from' => $this->getSingleAddress($message->getFrom()),
+                'from' => $this->getAddresses($message->getFrom(), true),
                 'replyTo' => $this->getSingleAddress($message->getReplyTo())
             ],
             'recipients' => $this->getAddresses($message->getTo())
@@ -79,7 +79,7 @@ class SparkPostAdapter extends AbstractAdapter
         }
     }
 
-    protected function getAddresses($addresses)
+    protected function getAddresses($addresses, $first = false)
     {
         $list = [];
 
@@ -102,6 +102,10 @@ class SparkPostAdapter extends AbstractAdapter
                     ],
                 ];
             }
+        }
+
+        if ($first && $list) {
+            return $list[0]['address'];
         }
 
         return $list;
