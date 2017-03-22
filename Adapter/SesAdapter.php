@@ -12,8 +12,8 @@
 
 namespace Nilead\Mail\Adapter;
 
-use Nilead\Notification\Message\MessageInterface;
 use Aws\Ses\SesClient;
+use Nilead\Notification\Message\MessageInterface;
 use Psr\Log\LoggerInterface;
 
 class SesAdapter extends AbstractAdapter

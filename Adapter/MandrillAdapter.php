@@ -12,8 +12,8 @@
 
 namespace Nilead\Mail\Adapter;
 
-use Nilead\Notification\Message\MessageInterface;
 use Mandrill;
+use Nilead\Notification\Message\MessageInterface;
 use Psr\Log\LoggerInterface;
 
 class MandrillAdapter extends AbstractAdapter
@@ -128,9 +128,9 @@ class MandrillAdapter extends AbstractAdapter
 
         $this->_getAddresses($message->getTo(), 'to', $list);
 
-//        $this->_getAddresses($message->getCc(), 'cc', $list);
+        //        $this->_getAddresses($message->getCc(), 'cc', $list);
 
-//        $this->_getAddresses($message->getBcc(), 'bcc', $list);
+        //        $this->_getAddresses($message->getBcc(), 'bcc', $list);
 
         return $list;
     }

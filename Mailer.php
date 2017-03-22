@@ -25,7 +25,7 @@ class Mailer
     protected $mailers = [];
 
     /**
-     * 
+     *
      * @var LoggerInterface
      */
     protected $logger;
@@ -34,10 +34,15 @@ class Mailer
     {
         $this->logger = $logger;
     }
-    
+
     public function registerMailer($key, AdapterInterface $client)
     {
         $this->mailers[$key] = $client;
+    }
+
+    public function hasMailer($key)
+    {
+        return isset($this->mailers[$key]);
     }
 
     public function send($key, MessageInterface $message)
