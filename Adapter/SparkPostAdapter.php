@@ -64,7 +64,8 @@ class SparkPostAdapter extends AbstractAdapter
                 'from' => $this->getAddresses($message->getFrom(), true),
                 'replyTo' => $this->getSingleAddress($message->getReplyTo())
             ],
-            'recipients' => $this->getAddresses($message->getTo())
+            'recipients' => $this->getAddresses($message->getTo()),
+            'metadata' => $message->getMetadata()
         ];
 
         return $content;
@@ -84,7 +85,7 @@ class SparkPostAdapter extends AbstractAdapter
         $list = [];
 
         if (!is_array($addresses)) {
-            $addresses = (array) $addresses;
+            $addresses = (array)$addresses;
         }
 
         foreach ($addresses as $key => $value) {
